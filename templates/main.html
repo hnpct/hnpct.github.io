@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Máy tính tuổi thông minh</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121833;
+      --text: #e8ebf8;
+      --muted: #b6bfdb;
+      --accent: #6aa9ff;
+      --accent-2: #9ef5c9;
+      --danger: #ff6b6b;
+      --ring: 0 0 0 3px rgba(106,169,255,.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb;
+        --panel: #ffffff;
+        --text: #0c1130;
+        --muted: #3c4769;
+        --accent: #2a6df6;
+        --accent-2: #0ca678;
+        --danger: #d64545;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text); background: radial-gradient(1200px 800px at 80% -10%, rgba(106,169,255,.18), transparent 60%),
+               radial-gradient(900px 700px at -10% 110%, rgba(14,158,110,.15), transparent 50%),
+               var(--bg);
+    }
+    .container { max-width: 980px; margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    h1 { font-size: clamp(24px, 4vw, 36px); margin: 0; letter-spacing: 0.2px; }
+    .card {
+      background: color-mix(in srgb, var(--panel) 95%, transparent);
+      border: 1px solid color-mix(in srgb, var(--panel) 75%, #000 10%);
+      border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.20);
+    }
+    .grid { display: grid; gap: 16px; }
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    @media (max-width: 760px) { .grid.cols-2 { grid-template-columns: 1fr; } }
+
+    label { font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px; }
+    input, select, button { font: inherit; }
+    .input {
+      width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--panel) 70%, #000 20%);
+      background: color-mix(in srgb, var(--panel) 95%, transparent); color: var(--text);
+      outline: none; transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .input:focus { box-shadow: var(--ring); border-color: var(--accent); }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn {
+      border: 0; padding: 12px 16px; border-radius: 14px; cursor: pointer;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, white 0%) 0%, color-mix(in srgb, var(--accent) 90%, black 0%) 100%);
+      color: white; font-weight: 600; box-shadow: 0 10px 20px rgba(42,109,246,.25);
+      transition: transform .06s ease, filter .2s ease; will-change: transform;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn:active { transform: translateY(1px); }
+    .btn.secondary { background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 80%, white 0%) 0%, color-mix(in srgb, var(--panel) 90%, black 0%) 100%); color: var(--text); box-shadow: none; border: 1px solid color-mix(in srgb, var(--panel) 75%, #000 10%); }
+    .btn.danger { background: linear-gradient(180deg, color-mix(in srgb, var(--danger) 80%, white 0%) 0%, color-mix(in srgb, var(--danger) 90%, black 0%) 100%); box-shadow: 0 10px 20px rgba(214,69,69,.25); }
+
+    .stat {
+      padding: 14px; border-radius: 16px; background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px dashed color-mix(in srgb, var(--panel) 70%, #000 20%);
+    }
+    .stat big { font-size: clamp(20px, 4vw, 32px); font-weight: 800; display: block; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--panel) 70%, #000 20%); }
+    .kbd { border: 1px solid color-mix(in srgb, var(--panel) 70%, #000 20%); border-bottom-width: 3px; padding: 2px 6px; border-radius: 6px; font-size: 12px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧮 Máy tính tuổi <span class="mono">thông minh</span></h1>
+      <div class="row" role="group" aria-label="Hành động nhanh">
+        <button class="btn secondary" id="toggle-theme" title="Đổi giao diện sáng/tối">🌗 Giao diện</button>
+        <button class="btn secondary" id="copy-link" title="Sao chép liên kết chứa ngày sinh">🔗 Sao chép liên kết</button>
+        <button class="btn danger" id="reset" title="Xóa dữ liệu">🗑️ Xóa</button>
+      </div>
+    </header>
+
+    <main class="grid" style="margin-top: 16px;">
+      <section class="card grid cols-2" aria-labelledby="nhap-lieu">
+        <div>
+          <h2 id="nhap-lieu" style="margin-top:0">Nhập dữ liệu</h2>
+          <label for="dob">Ngày sinh (YYYY-MM-DD)</label>
+          <input id="dob" class="input" type="date" inputmode="numeric" autocomplete="bday" required />
+
+          <div class="row" style="margin-top:12px">
+            <div style="flex:1; min-width: 220px;">
+              <label for="time">Giờ phút (tuỳ chọn)</label>
+              <input id="time" class="input" type="time" step="1" />
+            </div>
+            <div style="flex:1; min-width: 220px;">
+              <label for="tz">Múi giờ</label>
+              <select id="tz" class="input">
+                <option value="local">Theo máy (mặc định)</option>
+                <option value="UTC">UTC</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:14px">
+            <button id="calc" class="btn">Tính tuổi</button>
+            <span class="muted">Mẹo: nhấn <span class="kbd">Enter</span> để tính nhanh</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="margin-top:0">Kết quả nhanh</h2>
+          <div class="grid cols-2">
+            <div class="stat" id="age-ymd"><big>—</big><span class="muted">Năm • Tháng • Ngày</span></div>
+            <div class="stat" id="age-hms"><big>—</big><span class="muted">Giờ • Phút • Giây</span></div>
+            <div class="stat" id="totals"><big>—</big><span class="muted">Tổng ngày / giờ / phút</span></div>
+            <div class="stat" id="next-bday"><big>—</big><span class="muted">Sinh nhật kế tiếp & đếm ngược</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="moc">
+        <h2 id="moc" style="margin-top:0">Các mốc tuổi tròn</h2>
+        <div id="milestones" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));"></div>
+      </section>
+
+      <section class="card" aria-labelledby="chi-tiet">
+        <h2 id="chi-tiet" style="margin-top:0">Chi tiết</h2>
+        <div id="details" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;"></div>
+      </section>
+    </main>
+
+    <p class="footer">Tính toán chạy trên trình duyệt của bạn. Không gửi dữ liệu ra ngoài.</p>
+  </div>
+
+  <script>
+    const $ = (s, r=document) => r.querySelector(s);
+    const pad = (n, w=2) => String(n).padStart(w, '0');
+    const fmtInt = (n) => n.toLocaleString('vi-VN');
+
+    function daysInMonth(year, month) { // month: 0-11
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    function parseInputDate() {
+      const d = $('#dob').value;
+      if (!d) return null;
+      const t = $('#time').value || '00:00:00';
+      const [hh, mm, ss] = t.split(':').map(x => parseInt(x || '0', 10));
+      const [y, m, day] = d.split('-').map(x => parseInt(x, 10));
+
+      if ($('#tz').value === 'UTC') {
+        // Build a UTC date
+        const dt = new Date(Date.UTC(y, m-1, day, hh, mm, ss || 0));
+        return dt;
+      } else {
+        // Local date
+        const dt = new Date(y, m-1, day, hh, mm, ss || 0);
+        return dt;
+      }
+    }
+
+    function diffYMD(from, to) {
+      let y = to.getFullYear() - from.getFullYear();
+      let m = to.getMonth() - from.getMonth();
+      let d = to.getDate() - from.getDate();
+      if (d < 0) {
+        m -= 1;
+        const year = to.getMonth() === 0 ? to.getFullYear() - 1 : to.getFullYear();
+        const month = (to.getMonth() + 11) % 12; // previous month
+        d += daysInMonth(year, month);
+      }
+      if (m < 0) { y -= 1; m += 12; }
+      return { y, m, d };
+    }
+
+    function nextBirthday(dob, now) {
+      const month = dob.getMonth();
+      const date = dob.getDate();
+      const hour = dob.getHours();
+      const minute = dob.getMinutes();
+      const second = dob.getSeconds();
+
+      let year = now.getFullYear();
+      let candidate = new Date(year, month, date, hour, minute, second);
+
+      // Handle 29/02 trên năm không nhuận – dời sang 01/03
+      if (month === 1 && date === 29 && daysInMonth(year, 1) === 28) {
+        candidate = new Date(year, 2, 1, hour, minute, second);
+      }
+
+      if (candidate <= now) {
+        year += 1;
+        candidate = new Date(year, month, date, hour, minute, second);
+        if (month === 1 && date === 29 && daysInMonth(year, 1) === 28) {
+          candidate = new Date(year, 2, 1, hour, minute, second);
+        }
+      }
+      const ms = candidate - now;
+      const days = Math.floor(ms / 86400000);
+      const hours = Math.floor((ms % 86400000) / 3600000);
+      const minutes = Math.floor((ms % 3600000) / 60000);
+      const seconds = Math.floor((ms % 60000) / 1000);
+      return { when: candidate, left: { days, hours, minutes, seconds } };
+    }
+
+    const MILESTONES = [10, 16, 18, 20, 21, 25, 30, 40, 50, 60, 70, 80, 90, 100];
+
+    function buildMilestones(dob, now) {
+      const wrap = $('#milestones');
+      wrap.innerHTML = '';
+      for (const y of MILESTONES) {
+        const at = new Date(dob);
+        at.setFullYear(dob.getFullYear() + y);
+        // handle 29/02 -> 01/03 nếu cần
+        if (dob.getMonth() === 1 && dob.getDate() === 29 && at.getMonth() !== 1) {
+          at.setMonth(2, 1);
+        }
+        const past = at < now;
+        const diff = Math.abs(at - now);
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const mi = Math.floor((diff % 3600000) / 60000);
+        const status = past ? 'Đã qua' : 'Còn lại';
+        const badge = past ? '✅' : '⏳';
+        const html = `
+          <div class="stat">
+            <div class="muted">${badge} Tròn <strong>${y}</strong> tuổi</div>
+            <big>${past ? 'Cách đây' : 'Còn'} ${fmtInt(d)} ngày</big>
+            <div class="muted">${status}: ${fmtInt(d)} ngày ${h} giờ ${mi} phút</div>
+            <div class="muted">Ngày: <span class="mono">${at.toLocaleString('vi-VN')}</span></div>
+          </div>`;
+        wrap.insertAdjacentHTML('beforeend', html);
+      }
+    }
+
+    function buildDetails(dob, now, ymd) {
+      const details = $('#details');
+      const ms = Math.abs(now - dob);
+      const totalSeconds = Math.floor(ms / 1000);
+      const totalMinutes = Math.floor(ms / 60000);
+      const totalHours = Math.floor(ms / 3600000);
+      const totalDays = Math.floor(ms / 86400000);
+      const totalWeeks = Math.floor(totalDays / 7);
+
+      const weekday = ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'][dob.getDay()];
+      const leap = daysInMonth(dob.getFullYear(), 1) === 29;
+
+      const blocks = [
+        [`Bạn đã sống`, `<big>${fmtInt(totalDays)}</big> ngày`],
+        [`Tổng giờ`, `<big>${fmtInt(totalHours)}</big> giờ`],
+        [`Tổng phút`, `<big>${fmtInt(totalMinutes)}</big> phút`],
+        [`Tổng giây`, `<big>${fmtInt(totalSeconds)}</big> giây`],
+        [`Tổng tuần`, `<big>${fmtInt(totalWeeks)}</big> tuần`],
+        [`Sinh vào`, `<big>${weekday}</big>`],
+        [`Năm sinh`, `<big>${dob.getFullYear()}${leap ? ' (năm nhuận)' : ''}</big>`],
+        [`Tháng/Ngày sinh`, `<big>${pad(dob.getMonth()+1)}/${pad(dob.getDate())}</big>`],
+      ];
+
+      details.innerHTML = blocks.map(([k, v]) => `
+        <div class="stat">
+          <div class="muted">${k}</div>
+          ${v}
+        </div>`).join('');
+    }
+
+    function calculate() {
+      const dob = parseInputDate();
+      if (!dob || isNaN(dob.getTime())) {
+        alert('Vui lòng nhập ngày sinh hợp lệ.');
+        return;
+      }
+      const now = new Date();
+
+      // Y-M-D components
+      const ymd = diffYMD(dob, now);
+      $('#age-ymd').querySelector('big').textContent = `${fmtInt(ymd.y)} năm • ${ymd.m} tháng • ${ymd.d} ngày`;
+
+      // Totals
+      const diffMs = Math.abs(now - dob);
+      const hours = Math.floor(diffMs / 3600000);
+      const minutes = Math.floor(diffMs / 60000);
+      const seconds = Math.floor(diffMs / 1000);
+      $('#age-hms').querySelector('big').textContent = `${fmtInt(hours)} giờ • ${fmtInt(minutes)} phút • ${fmtInt(seconds)} giây`;
+      $('#totals').querySelector('big').textContent = `${fmtInt(Math.floor(diffMs/86400000))} ngày / ${fmtInt(hours)} giờ / ${fmtInt(minutes)} phút`;
+
+      // Next birthday
+      const nb = nextBirthday(dob, now);
+      const nbbig = $('#next-bday').querySelector('big');
+      nbbig.innerHTML = `${nb.when.toLocaleString('vi-VN')}<br><span class="muted">Còn ${fmtInt(nb.left.days)} ngày ${nb.left.hours} giờ ${nb.left.minutes} phút ${nb.left.seconds} giây</span>`;
+
+      buildMilestones(dob, now);
+      buildDetails(dob, now, ymd);
+
+      // Update URL (DOB only, hh:mm:ss if provided)
+      const d = $('#dob').value;
+      const t = $('#time').value;
+      const params = new URLSearchParams(location.search);
+      params.set('dob', d);
+      if (t) params.set('time', t); else params.delete('time');
+      const url = `${location.pathname}?${params.toString()}`;
+      history.replaceState({}, '', url);
+    }
+
+    function hydrateFromURL() {
+      const params = new URLSearchParams(location.search);
+      const d = params.get('dob');
+      const t = params.get('time');
+      if (d) $('#dob').value = d;
+      if (t) $('#time').value = t;
+      if (d) calculate();
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.dataset.theme || 'auto';
+      const next = current === 'dark' ? 'light' : current === 'light' ? 'auto' : 'dark';
+      document.documentElement.dataset.theme = next;
+      if (next === 'dark') {
+        document.documentElement.style.colorScheme = 'dark';
+      } else if (next === 'light') {
+        document.documentElement.style.colorScheme = 'light';
+      } else {
+        document.documentElement.style.colorScheme = 'normal';
+      }
+      localStorage.setItem('agecalc-theme', next);
+      $('#toggle-theme').textContent = next === 'dark' ? '🌙 Tối' : next === 'light' ? '🌞 Sáng' : '🌗 Tự động';
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('agecalc-theme') || 'auto';
+      document.documentElement.dataset.theme = saved;
+      if (saved === 'dark') document.documentElement.style.colorScheme = 'dark';
+      if (saved === 'light') document.documentElement.style.colorScheme = 'light';
+      $('#toggle-theme').textContent = saved === 'dark' ? '🌙 Tối' : saved === 'light' ? '🌞 Sáng' : '🌗 Tự động';
+    }
+
+    // Events
+    $('#calc').addEventListener('click', calculate);
+    $('#reset').addEventListener('click', () => { $('#dob').value = ''; $('#time').value=''; history.replaceState({}, '', location.pathname); $('#age-ymd big').textContent='—'; $('#age-hms big').textContent='—'; $('#totals big').textContent='—'; $('#next-bday big').textContent='—'; $('#milestones').innerHTML=''; $('#details').innerHTML=''; });
+    $('#copy-link').addEventListener('click', () => {
+      const url = location.href;
+      navigator.clipboard.writeText(url).then(()=>{
+        const btn = $('#copy-link');
+        const old = btn.textContent; btn.textContent = '✅ Đã sao chép';
+        setTimeout(()=> btn.textContent = old, 1500);
+      });
+    });
+    $('#toggle-theme').addEventListener('click', toggleTheme);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') calculate(); });
+
+    initTheme();
+    hydrateFromURL();
+  </script>
+</body>
+</html>

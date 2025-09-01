@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check if username and password match the stored credentials
             if (localStorage.getItem(username) === password) {
                 alert('Đăng nhập thành công!');
-                window.location.href = 'templates/welcome.html'; // Redirect to template in subfolder
+                window.location.href = 'templates/main.html'; // Redirect to template in subfolder
             } else {
                 alert('Tên đăng nhập hoặc mật khẩu không đúng.');
             }
